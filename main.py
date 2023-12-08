@@ -111,10 +111,10 @@ def load_data():
 index = load_data()
 
 # chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
-# chat_engine = index.as_chat_engine(chat_mode="context",
-#     memory=memory, verbose=True)
+chat_engine = index.as_chat_engine(chat_mode="context",
+    memory=memory, verbose=True)
 
-chat_engine = index.as_query_engine()
+# chat_engine = index.as_query_engine()
 
 import numpy as np
 
@@ -154,9 +154,9 @@ for message in st.session_state.messages: # Display the prior chat messages
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = chat_engine.query(prompt)
+            response = chat_engine.chat(prompt)
             st.write(response.response)
             with tru_query_engine_recorder as recording:
-                chat_engine.query(prompt)
+                chat_engine.chat(prompt)
             message = {"role": "assistant", "content": response.response}
             st.session_state.messages.append(message) # Add response to message history
