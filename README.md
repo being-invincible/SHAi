@@ -1,5 +1,6 @@
 # SHAi
- 
+
+![Alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Frisehydroponics.in%2Fhydroponics-farming-in-india%2F&psig=AOvVaw1oT9OObRfOi6z3PneubEAi&ust=1702136238207000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCKCQr-OVgIMDFQAAAAAdAAAAABAP)
 Empowering Agriculture Through Knowledge
 
 ## Introduction:
