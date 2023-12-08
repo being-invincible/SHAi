@@ -9,10 +9,14 @@ from llama_index.llms import PaLM
 from llama_index.embeddings import GooglePaLMEmbedding
 from llama_index.memory import ChatMemoryBuffer
 import numpy as np
-from trulens_eval import TruLlama, Tru, Query, Feedback, feedback
 import google.generativeai as palm
 import os
 import pickle
+from trulens_eval import Feedback, Tru, TruLlama
+from trulens_eval.feedback import Groundedness
+from trulens_eval.feedback.provider.openai import OpenAI as OAI
+
+tru = Tru()
 
 # 1. Set up the name of the collection to be created.
 COLLECTION_NAME = 'hydroponics_knowledge_base'
@@ -107,16 +111,23 @@ def load_data():
 index = load_data()
 
 # chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
-chat_engine = index.as_chat_engine(chat_mode="context",
-    memory=memory, verbose=True)
+# chat_engine = index.as_chat_engine(chat_mode="context",
+#     memory=memory, verbose=True)
 
-# Initialize Huggingface-based feedback function collection class:
-hugs = feedback.Huggingface()
-openai = feedback.OpenAI()
-# Define a language match feedback function using HuggingFace.
-f_lang_match = Feedback(hugs.language_match).on_input_output()
-# By default this will check language match on the main app input and main app
-# output.
+chat_engine = index.as_query_engine()
+
+import numpy as np
+
+# Initialize provider class
+openai = OAI()
+
+grounded = Groundedness(groundedness_provider=OAI())
+
+# Define a groundedness feedback function
+f_groundedness = Feedback(grounded.groundedness_measure_with_cot_reasons).on(
+    TruLlama.select_source_nodes().node.text.collect()
+    ).on_output(
+    ).aggregate(grounded.grounded_statements_aggregator)
 
 # Question/answer relevance between overall question and answer.
 f_qa_relevance = Feedback(openai.relevance).on_input_output()
@@ -124,13 +135,12 @@ f_qa_relevance = Feedback(openai.relevance).on_input_output()
 # Question/statement relevance between question and each context chunk.
 f_qs_relevance = Feedback(openai.qs_relevance).on_input().on(
     TruLlama.select_source_nodes().node.text
-).aggregate(np.min)
+    ).aggregate(np.mean)
 
-feedbacks = [f_lang_match, f_qa_relevance, f_qs_relevance]
+tru_query_engine_recorder = TruLlama(chat_engine,
+    app_id='SHAi_App',
+    feedbacks=[f_groundedness, f_qa_relevance, f_qs_relevance])
 
-chat_engine = TruLlama(chat_engine, feedbacks=feedbacks, app_id="SHAi App")
-
-tru = Tru()
 tru.run_dashboard()
 
 if prompt := st.chat_input("Your question"): # Prompt for user input and save to chat history
@@ -144,7 +154,9 @@ for message in st.session_state.messages: # Display the prior chat messages
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = chat_engine.chat(prompt)
+            response = chat_engine.query(prompt)
             st.write(response.response)
+            with tru_query_engine_recorder as recording:
+                chat_engine.query(prompt)
             message = {"role": "assistant", "content": response.response}
             st.session_state.messages.append(message) # Add response to message history
