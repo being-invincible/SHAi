@@ -1,6 +1,6 @@
 # SHAi
 
-https://www.google.com/url?sa=i&url=https%3A%2F%2Frisehydroponics.in%2Fthe-future-of-crop-cultivation%2F&psig=AOvVaw1oT9OObRfOi6z3PneubEAi&ust=1702136238207000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCKCQr-OVgIMDFQAAAAAdAAAAABAn![Empowering Agriculture Through Knowledge](https://github.com/being-invincible/SHAi/assets/86947956/1f79538e-e567-42a8-9904-7e71ede105b7)
+![Empowering Agriculture Through Knowledge](https://github.com/being-invincible/SHAi/assets/86947956/1f79538e-e567-42a8-9904-7e71ede105b7)
 
 ## Introduction:
 SHAi, which stands for Sustainable Hydroponic AI, is a groundbreaking project aimed at revolutionizing hydroponic farming practices. Focused on sustainability, this domain-specific Large Language Model (LLM) is designed to cater to the diverse needs of hydroponic enthusiasts while aligning with eco-friendly agricultural methods.
