@@ -12,25 +12,7 @@ import numpy as np
 from trulens_eval import TruLlama, Tru, Query, Feedback, feedback
 import google.generativeai as palm
 import os
-import subprocess
-import sys
-
-def clone_or_update_git_repo(repo_url, local_dir):
-    # Check if the directory exists
-    if os.path.exists(local_dir):
-        print(f"Directory '{local_dir}' already exists. Updating the repository...")
-        # If the directory exists, perform a git pull to update the repository
-        subprocess.run(['git', 'pull'], cwd=local_dir, check=True)
-    else:
-        print(f"Directory '{local_dir}' does not exist. Cloning the repository...")
-        # If the directory does not exist, clone the repository
-        subprocess.run(['git', 'clone', repo_url, local_dir], check=True)
-
-# Example usage
-repository_url = 'https://github.com/being-invincible/hydroponics-grow-guide-dataset'
-local_directory = './hydroponics-grow-guide-dataset'
-
-clone_or_update_git_repo(repository_url, local_directory)
+import pickle
 
 # 1. Set up the name of the collection to be created.
 COLLECTION_NAME = 'hydroponics_knowledge_base'
@@ -66,10 +48,8 @@ llm = PaLM(api_key=palm_api_key)
 # # OpenAI API key
 os.environ["OPENAI_API_KEY"] = st.secrets["OPEN_API_KEY"]
 
-# Load the markdown reader from the hub
-MarkdownReader = download_loader("MarkdownReader")
-markdownreader = MarkdownReader()
-
+# To load the data from pickle
+        
 memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
 
 # Query Engine
@@ -97,8 +77,9 @@ def load_data():
     with st.spinner(text="Loading and indexing the vectors from Zilliz – hang tight! This should take 30 - 50 seconds"):
         # Grab all markdown files and convert them using the reader
         docs = []
-        for file in glob("./hydroponics-grow-guide-dataset/*.md", recursive=True):
-            docs.extend(markdownreader.load_data(file=file))
+        if os.path.exists("docs.pkl"):
+            with open("docs.pkl", "rb") as f:
+                docs = pickle.load(f)
         
         # Push all markdown files into Zilliz Cloud
         vector_store = MilvusVectorStore(
