@@ -52,8 +52,8 @@ llm = PaLM(api_key=palm_api_key)
 # # OpenAI API key
 os.environ["OPENAI_API_KEY"] = st.secrets["OPEN_API_KEY"]
 
-# To load the data from pickle
-        
+
+# Creating memory        
 memory = ChatMemoryBuffer.from_defaults(token_limit=1500)
 
 # Query Engine
@@ -83,9 +83,10 @@ def load_data():
         docs = []
         if os.path.exists("docs.pkl"):
             with open("docs.pkl", "rb") as f:
+                # To load the data from pickle
                 docs = pickle.load(f)
         
-        # Push all markdown files into Zilliz Cloud
+        # Push all doc files into Zilliz Cloud
         vector_store = MilvusVectorStore(
             uri=URI, 
             token=TOKEN, 
@@ -116,32 +117,33 @@ chat_engine = index.as_chat_engine(chat_mode="context",
 
 # chat_engine = index.as_query_engine()
 
-import numpy as np
+# Turning off Trulens in production app - to eliminate production error
+# import numpy as np
 
-# Initialize provider class
-openai = OAI()
+# # Initialize provider class
+# openai = OAI()
 
-grounded = Groundedness(groundedness_provider=OAI())
+# grounded = Groundedness(groundedness_provider=OAI())
 
-# Define a groundedness feedback function
-f_groundedness = Feedback(grounded.groundedness_measure_with_cot_reasons).on(
-    TruLlama.select_source_nodes().node.text.collect()
-    ).on_output(
-    ).aggregate(grounded.grounded_statements_aggregator)
+# # Define a groundedness feedback function
+# f_groundedness = Feedback(grounded.groundedness_measure_with_cot_reasons).on(
+#     TruLlama.select_source_nodes().node.text.collect()
+#     ).on_output(
+#     ).aggregate(grounded.grounded_statements_aggregator)
 
-# Question/answer relevance between overall question and answer.
-f_qa_relevance = Feedback(openai.relevance).on_input_output()
+# # Question/answer relevance between overall question and answer.
+# f_qa_relevance = Feedback(openai.relevance).on_input_output()
 
-# Question/statement relevance between question and each context chunk.
-f_qs_relevance = Feedback(openai.qs_relevance).on_input().on(
-    TruLlama.select_source_nodes().node.text
-    ).aggregate(np.mean)
+# # Question/statement relevance between question and each context chunk.
+# f_qs_relevance = Feedback(openai.qs_relevance).on_input().on(
+#     TruLlama.select_source_nodes().node.text
+#     ).aggregate(np.mean)
 
-tru_query_engine_recorder = TruLlama(chat_engine,
-    app_id='SHAi_App',
-    feedbacks=[f_groundedness, f_qa_relevance, f_qs_relevance])
+# tru_query_engine_recorder = TruLlama(chat_engine,
+#     app_id='SHAi_App',
+#     feedbacks=[f_groundedness, f_qa_relevance, f_qs_relevance])
 
-tru.run_dashboard()
+# tru.run_dashboard()
 
 if prompt := st.chat_input("Your question"): # Prompt for user input and save to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -151,12 +153,31 @@ for message in st.session_state.messages: # Display the prior chat messages
         st.write(message["content"])
 
 # If last message is not from assistant, generate a new response
+# if st.session_state.messages[-1]["role"] != "assistant":
+#     with st.chat_message("assistant"):
+#         with st.spinner("Thinking..."):
+#             response = ""
+#             try:
+#                 response = chat_engine.chat(prompt)
+#                 st.write(response.response)
+#             except Exception as e:
+#                 st.error(f"Error during chat: {e}")
+#             # with tru_query_engine_recorder as recording:
+#             #     chat_engine.chat(prompt)
+#             message = {"role": "assistant", "content": response.response}
+#             st.session_state.messages.append(message) # Adds response to message history
+
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            response = chat_engine.chat(prompt)
-            st.write(response.response)
-            with tru_query_engine_recorder as recording:
-                chat_engine.chat(prompt)
-            message = {"role": "assistant", "content": response.response}
-            st.session_state.messages.append(message) # Add response to message history
+        try:
+            with st.spinner("Thinking..."):
+                response = chat_engine.chat(prompt)
+                st.write(response.response)
+                message = {"role": "assistant", "content": response.response}
+                st.session_state.messages.append(message)
+        except Exception as e:
+            # st.error(f"Error generating response: {e}")
+            response= "I regret that I cannot provide information on this matter. Perhaps I could assist you with a different question related to hydroponics?"
+            st.write(response)
+            message = {"role": "assistant", "content": response}
+            st.session_state.messages.append(message)
