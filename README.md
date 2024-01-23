@@ -3,7 +3,7 @@
 ## Introduction:
 SHAi, which stands for Sustainable Hydroponic AI, is a groundbreaking project aimed at revolutionizing hydroponic farming practices. Focused on sustainability, this domain-specific Large Language Model (LLM) is designed to cater to the diverse needs of hydroponic enthusiasts while aligning with eco-friendly agricultural methods.
 
-![SHAi Robot and an Human cultivating an hydroponics farm](https://github.com/being-invincible/SHAi/assets/86947956/89e90bcc-4cc5-458d-802e-ef94416af707)
+![SHAi Robot and an Human cultivating an hydroponics farm](https://github.com/being-invincible/SHAi/assets/86947956/9d2ce5ba-0d8b-4e93-8d40-91b274b68db8)
 
 
 ## Key Features:
