@@ -37,10 +37,10 @@ The absence of a comprehensive and accessible guide for hydroponic farming, span
 ## Proposed Solution:
 In the dynamic landscape of hydroponic farming, accessibility to reliable information is crucial, spanning from home-based enthusiasts to industrial-grade practitioners. To address this, our project utilizes cutting-edge technologies, integrating Zilliz for storing vector embeddings derived from Google PALM Embeddings. This innovative approach harnesses web-scraped data stored in Github Markdown files to create a robust vector knowledge base.
 
+![shai_title](https://github.com/being-invincible/SHAi/assets/86947956/4934b651-2f34-40db-9a93-2959c2f01480)
+
 ## Methodology:
 The SHAi project leverages the LlamaIndex framework to streamline the Retrieval Augmented Generation (RAG) process, enhancing the querying of the Zilliz vector database. With the assistance of LlamaIndex, context and prompts are efficiently extracted, enriching the information passed to Vertex AI's PaLM (Parameterized Language Model) for generating more prominent and relevant responses. This synergy between LlamaIndex and RAG ensures that the Language Model eliminates LLM hallucinations and accommodates a diverse audience, offering tailored guidance across proficiency levels in both home-based and industrial-grade hydroponic farming. The entire system is seamlessly integrated into a user-friendly Streamlit app, further enhancing accessibility and user interaction.
-
-![shai_title](https://github.com/being-invincible/SHAi/assets/86947956/4934b651-2f34-40db-9a93-2959c2f01480)
 
 ## App Structure - RAG
 
